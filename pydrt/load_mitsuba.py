@@ -1,11 +1,11 @@
 import torch
 import xml.etree.ElementTree as etree
 import numpy as np
-import vredner
-from vredner import nder, angleEps
+import drt
+from drt import nder, angleEps
 import os
-import pyvredner
-import pyvredner.transform as transform
+import pydrt
+import pydrt.transform as transform
 
 def parse_transform(node):
     ret = torch.eye(4)
@@ -89,7 +89,7 @@ def parse_camera(node, medium_dict):
             med_id = medium_dict[child.attrib['id']]
 
 
-    return pyvredner.Camera(position     = position,
+    return pydrt.Camera(position     = position,
                             look_at      = look_at,
                             up           = up,
                             fov          = fov,
@@ -107,9 +107,9 @@ def parse_bsdf(node, two_sided = False):
         for child in node:
             if child.attrib['name'] == 'reflectance':
                 diffuse_reflectance = parse_vector(child.attrib['value'])
-        return (node_id, pyvredner.BSDF_diffuse(diffuse_reflectance = diffuse_reflectance))
+        return (node_id, pydrt.BSDF_diffuse(diffuse_reflectance = diffuse_reflectance))
     elif node.attrib['type'] == 'null':
-        return (node_id, pyvredner.BSDF_null())
+        return (node_id, pydrt.BSDF_null())
     elif node.attrib['type'] == 'phong':
         diffuse_reflectance = torch.tensor([0.5, 0.5, 0.5])
         specular_reflectance = torch.tensor([0.2, 0.2, 0.2])
@@ -121,7 +121,7 @@ def parse_bsdf(node, two_sided = False):
                 specular_reflectance = parse_vector(child.attrib['value'])
             elif child.attrib['name'] == 'exponent':
                 exponent = parse_vector(child.attrib['value'])
-        return (node_id, pyvredner.BSDF_Phong(diffuse_reflectance, specular_reflectance, exponent))
+        return (node_id, pydrt.BSDF_Phong(diffuse_reflectance, specular_reflectance, exponent))
     elif node.attrib['type'] == 'roughdielectric':
         for child in node:
             if child.attrib['name'] == 'alpha':
@@ -130,19 +130,19 @@ def parse_bsdf(node, two_sided = False):
                 intIOR = parse_vector(child.attrib['value'])
             elif child.attrib['name'] == 'extIOR':
                 extIOR = parse_vector(child.attrib['value'])
-        return (node_id, pyvredner.BSDF_roughdielectric(alpha, intIOR, extIOR))
+        return (node_id, pydrt.BSDF_roughdielectric(alpha, intIOR, extIOR))
     else:
         print('Unsupported bsdf type:', node.attrib['type'])
         assert(False)
 
 def parse_phase(node):
     if node.attrib['type'] == 'isotropic':
-        return pyvredner.Isotropic()
+        return pydrt.Isotropic()
     elif node.attrib['type'] == 'hg':
         for child in node:
             if child.attrib['name'] == 'g':
                 g = parse_vector(child.attrib['value'])
-        return pyvredner.HG(g)
+        return pydrt.HG(g)
 
 def parse_medium(node):
     node_id = None
@@ -160,8 +160,8 @@ def parse_medium(node):
             elif child.attrib['name'] == 'albedo':
                 albedo = parse_vector(child.attrib['value'])
         if phase == None:
-            phase = pyvredner.Isotropic();
-        return (node_id, pyvredner.Homogeneous(sigma_t = sigma_t, albedo = albedo, phase_id = -1), phase)
+            phase = pydrt.Isotropic();
+        return (node_id, pydrt.Homogeneous(sigma_t = sigma_t, albedo = albedo, phase_id = -1), phase)
     elif node.attrib['type'] == 'heterogeneous':
         scalar = 1.0
         for child in node:
@@ -190,10 +190,10 @@ def parse_medium(node):
                 if child.attrib['name'] == 'scale':
                     scalar = parse_vector(child.attrib['value'])
         if phase == None:
-            phase = pyvredner.Isotropic();
+            phase = pydrt.Isotropic();
         if isinstance(albedo, str):
             assert (torch.all(torch.lt(torch.abs(torch.add(to_world, -to_world0)), 1e-6)))
-        return (node_id, pyvredner.Heterogeneous(fn_density = fn_density, albedo = albedo, scalar = scalar, to_world = to_world.contiguous(), phase_id = -1), phase)
+        return (node_id, pydrt.Heterogeneous(fn_density = fn_density, albedo = albedo, scalar = scalar, to_world = to_world.contiguous(), phase_id = -1), phase)
     else:
         print('Unsupported bsdf type:', node.attrib['type'])
         assert(False)
@@ -256,7 +256,7 @@ def parse_shape(node, bsdf_dict, med_dict, shape_id):
         uvs = None
         normals = None
     else:
-        mesh_list = pyvredner.load_obj(filename)
+        mesh_list = pydrt.load_obj(filename)
         vertices = mesh_list[0].vertices.cpu()
         indices = mesh_list[0].indices.cpu()
         uvs = mesh_list[0].uvs
@@ -279,10 +279,10 @@ def parse_shape(node, bsdf_dict, med_dict, shape_id):
     lgt = None
     if light_intensity is not None:
         if light_kappa is None:
-            lgt = pyvredner.AreaLight(shape_id, light_intensity)
+            lgt = pydrt.AreaLight(shape_id, light_intensity)
         else:
-            lgt = pyvredner.AreaLightEx(shape_id, light_intensity, light_kappa)
-    return pyvredner.Shape(vertices, indices, uvs, normals, bsdf_id, med_ext_id, med_int_id), lgt
+            lgt = pydrt.AreaLightEx(shape_id, light_intensity, light_kappa)
+    return pydrt.Shape(vertices, indices, uvs, normals, bsdf_id, med_ext_id, med_int_id), lgt
 
 def parse_scene(node):
     cam = None
@@ -316,25 +316,25 @@ def parse_scene(node):
                 lights.append(light)
         elif child.tag == 'integrator':
             if child.attrib['type'] == 'direct':
-                integrator = vredner.DirectIntegrator();
+                integrator = drt.DirectIntegrator();
             elif child.attrib['type'] == 'path':
-                integrator = vredner.PathTracer();
+                integrator = drt.PathTracer();
             elif child.attrib['type'] == 'volpath_simple':
-                integrator = vredner.VolPathTracerSimple();
+                integrator = drt.VolPathTracerSimple();
             elif child.attrib['type'] == 'volpath':
-                integrator = vredner.VolPathTracer();
+                integrator = drt.VolPathTracer();
             elif child.attrib['type'] == 'directAD':
-                integrator = vredner.DirectAD();
+                integrator = drt.DirectAD();
             elif child.attrib['type'] == 'pathAD':
-                integrator = vredner.PathTracerAD();
+                integrator = drt.PathTracerAD();
             elif child.attrib['type'] == 'volpathAD':
-                integrator = vredner.VolPathTracerAD();
+                integrator = drt.VolPathTracerAD();
             elif child.attrib['type'] == 'ptracer':
-                integrator = vredner.ParticleTracer();
+                integrator = drt.ParticleTracer();
             else:
                 raise Exception("Integrator type [ %s ] not supported!" % child.attrib['type'])
             # print("Rendering using [ %s ] ..." % child.attrib['type'])
-    return pyvredner.Scene(cam, shapes, bsdfs, mediums, phases, lights), integrator
+    return pydrt.Scene(cam, shapes, bsdfs, mediums, phases, lights), integrator
 
 def load_mitsuba(filename):
     """

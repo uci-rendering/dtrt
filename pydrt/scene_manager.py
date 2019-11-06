@@ -1,12 +1,12 @@
 import numpy as np
 import torch
-import vredner
-from vredner import nder
+import drt
+from drt import nder
 import copy
 from math import cos, sin, sqrt
 import math
 import struct
-import pyvredner.transform as transform
+import pydrt.transform as transform
 
 class SceneTransform:
     def __init__(self, type_name, *args):

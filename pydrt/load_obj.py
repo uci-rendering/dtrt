@@ -1,6 +1,6 @@
 import torch
 import re
-import pyvredner
+import pydrt
 import os
 
 class TriangleMesh:

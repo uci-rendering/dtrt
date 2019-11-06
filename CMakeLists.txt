@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(vredner VERSION 0.0.1 DESCRIPTION "Differentiable Volume Path Tracer")
+project(drt VERSION 0.0.1 DESCRIPTION "Differentiable Radiative Transfer")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -115,18 +115,18 @@ set(SRCS include/config.h
          src/unit_test/ad_test.cpp
          src/unit_test/volume_test.h
          src/unit_test/volume_test.cpp
-         src/vredner.cpp
+         src/drt.cpp
          )
 
 if(APPLE)
     set(DYNAMIC_LOOKUP "-undefined dynamic_lookup")
 endif()
 if (WIN32)
-    pybind11_add_module(vredner SHARED  ${SRCS} )
+    pybind11_add_module(drt SHARED  ${SRCS} )
 endif()
 
 if (NOT WIN32)
-    add_library(vredner MODULE ${SRCS})
+    add_library(drt MODULE ${SRCS})
     # The "-undefined dynamic_lookup" is a hack for systems with
     # multiple Python installed. If we link a particular Python version
     # here, and we import it with a different Python version later.
@@ -135,17 +135,17 @@ if (NOT WIN32)
     # https://github.com/pybind/pybind11/blob/master/tools/pybind11Tools.cmake
     # is to not link against Python library at all and resolve the symbols
     # at compile time.
-    target_link_libraries(vredner
+    target_link_libraries(drt
         ${EMBREE_LIBRARY}
         ${DYNAMIC_LOOKUP})
 else()
-    target_link_libraries(vredner
+    target_link_libraries(drt
     PRIVATE
         ${EMBREE_LIBRARY}
         )
 endif()
 
-set_target_properties(vredner PROPERTIES PREFIX "")
+set_target_properties(drt PROPERTIES PREFIX "")
 
 execute_process(
     COMMAND "python" -c "if True:
@@ -155,7 +155,7 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 install(
-    TARGETS vredner
+    TARGETS drt
     DESTINATION ${PYTHON_SITE})
 
 execute_process (

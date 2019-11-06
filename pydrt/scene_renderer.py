@@ -1,11 +1,11 @@
-import vredner
+import drt
 import torch
 import time
 
 print_timing = True
 def serialize_scene(scene):
     """
-        Given a PyvRedner scene, convert it to a linear list of argument,
+        Given a Pydrt scene, convert it to a linear list of argument,
         so that we can use it in PyTorch.
     """
     cam = scene.camera
@@ -125,11 +125,11 @@ def render_scene(integrator, options, *args):
     if cam_vel is not None:
         assert(cam_vel.is_contiguous())
 
-    camera = vredner.Camera(resolution[0], resolution[1],
-                            vredner.float_ptr(cam_to_world.data_ptr()),
-                            vredner.float_ptr(cam_to_ndc.data_ptr()),
+    camera = drt.Camera(resolution[0], resolution[1],
+                            drt.float_ptr(cam_to_world.data_ptr()),
+                            drt.float_ptr(cam_to_ndc.data_ptr()),
                             clip_near, cam_med_id, 
-                            vredner.float_ptr(cam_vel.data_ptr()) if cam_vel is not None else 0)
+                            drt.float_ptr(cam_vel.data_ptr()) if cam_vel is not None else 0)
     camera.set_rect(rect[0], rect[1], rect[2], rect[3])
     
     current_index = 12
@@ -152,41 +152,41 @@ def render_scene(integrator, options, *args):
             assert(normals.is_contiguous())
         if shape_vel is not None:
             assert( shape_vel.is_contiguous() )
-        shapes.append(vredner.Shape(\
-            vredner.float_ptr(vertices.data_ptr()),
-            vredner.int_ptr(indices.data_ptr()),
-            vredner.float_ptr(uvs.data_ptr() if uvs is not None else 0),
-            vredner.float_ptr(normals.data_ptr() if normals is not None else 0),
+        shapes.append(drt.Shape(\
+            drt.float_ptr(vertices.data_ptr()),
+            drt.int_ptr(indices.data_ptr()),
+            drt.float_ptr(uvs.data_ptr() if uvs is not None else 0),
+            drt.float_ptr(normals.data_ptr() if normals is not None else 0),
             int(vertices.shape[0]),
             int(indices.shape[0]),
             light_id, bsdf_id, med_int_id, med_ext_id, 
-            vredner.float_ptr(shape_vel.data_ptr() if shape_vel is not None else 0)))
+            drt.float_ptr(shape_vel.data_ptr() if shape_vel is not None else 0)))
         current_index += 9
     bsdfs = []   
     for i in range(num_bsdfs):
         if args[current_index] == 'null':
-            bsdfs.append(vredner.BSDF_null())
+            bsdfs.append(drt.BSDF_null())
             current_index += 1
         elif args[current_index] == 'diffuse':
             diffuse_reflectance = args[current_index + 1]
-            vec_reflectance     = vredner.Spectrum3f(diffuse_reflectance[0], diffuse_reflectance[1], diffuse_reflectance[2])
+            vec_reflectance     = drt.Spectrum3f(diffuse_reflectance[0], diffuse_reflectance[1], diffuse_reflectance[2])
             default             = args[current_index + 2] is None
             if default:
-                bsdfs.append(vredner.BSDF_diffuse(vec_reflectance))
+                bsdfs.append(drt.BSDF_diffuse(vec_reflectance))
             else:
                 d_reflectance = args[current_index + 2]
                 assert(d_reflectance.is_contiguous())
-                bsdfs.append(vredner.BSDF_diffuse(vec_reflectance, vredner.float_ptr(d_reflectance.data_ptr())))
+                bsdfs.append(drt.BSDF_diffuse(vec_reflectance, drt.float_ptr(d_reflectance.data_ptr())))
             current_index += 3
         elif args[current_index] == 'phong':
             diffuse_reflectance  = args[current_index + 1]
             specular_reflectance = args[current_index + 2]
             exponent = args[current_index + 3]
-            vec_kd  = vredner.Spectrum3f(diffuse_reflectance[0], diffuse_reflectance[1], diffuse_reflectance[2])
-            vec_ks  = vredner.Spectrum3f(specular_reflectance[0], specular_reflectance[1], specular_reflectance[2])
+            vec_kd  = drt.Spectrum3f(diffuse_reflectance[0], diffuse_reflectance[1], diffuse_reflectance[2])
+            vec_ks  = drt.Spectrum3f(specular_reflectance[0], specular_reflectance[1], specular_reflectance[2])
             default = args[current_index + 4] is None
             if default:
-                bsdfs.append(vredner.BSDF_Phong(vec_kd, vec_ks, exponent))
+                bsdfs.append(drt.BSDF_Phong(vec_kd, vec_ks, exponent))
             else:
                 d_diffuse = args[current_index + 4]
                 assert( d_diffuse.is_contiguous() )
@@ -194,10 +194,10 @@ def render_scene(integrator, options, *args):
                 assert( (d_specular is not None) and d_specular.is_contiguous() )                
                 d_exponent = args[current_index + 6]
                 assert( (d_exponent is not None) and d_exponent.is_contiguous() )
-                bsdfs.append(vredner.BSDF_Phong(vec_kd, vec_ks, exponent, 
-                                                vredner.float_ptr(d_diffuse.data_ptr()),
-                                                vredner.float_ptr(d_specular.data_ptr()), 
-                                                vredner.float_ptr(d_exponent.data_ptr())))
+                bsdfs.append(drt.BSDF_Phong(vec_kd, vec_ks, exponent, 
+                                                drt.float_ptr(d_diffuse.data_ptr()),
+                                                drt.float_ptr(d_specular.data_ptr()), 
+                                                drt.float_ptr(d_exponent.data_ptr())))
             current_index += 7
         elif args[current_index] == 'roughdielectric':
             alpha   = args[current_index + 1]
@@ -205,13 +205,13 @@ def render_scene(integrator, options, *args):
             extIOR  = args[current_index + 3]
             default = args[current_index + 4] is None
             if default:
-                bsdfs.append(vredner.BSDF_roughdielectric(alpha, intIOR, extIOR))
+                bsdfs.append(drt.BSDF_roughdielectric(alpha, intIOR, extIOR))
             else:
                 d_alpha = args[current_index + 4]
                 assert( d_alpha.is_contiguous() )
                 d_eta = args[current_index + 5]
                 assert( (d_eta is not None) and d_eta.is_contiguous())
-                bsdfs.append(vredner.BSDF_roughdielectric(alpha, intIOR, extIOR, vredner.float_ptr(d_alpha.data_ptr()), vredner.float_ptr(d_eta.data_ptr())))
+                bsdfs.append(drt.BSDF_roughdielectric(alpha, intIOR, extIOR, drt.float_ptr(d_alpha.data_ptr()), drt.float_ptr(d_eta.data_ptr())))
             current_index += 6
         else:
             raise
@@ -221,21 +221,21 @@ def render_scene(integrator, options, *args):
             shape_id    = args[current_index + 1]
             intensity   = args[current_index + 2]
             two_sided   = args[current_index + 3]
-            area_lights.append(vredner.AreaLight(shape_id, vredner.float_ptr(intensity.data_ptr()), two_sided))
+            area_lights.append(drt.AreaLight(shape_id, drt.float_ptr(intensity.data_ptr()), two_sided))
             current_index += 4
         else:
             shape_id    = args[current_index + 1]
-            intensity   = vredner.Spectrum3f(args[current_index + 2][0], args[current_index + 2][1], args[current_index + 2][2])
+            intensity   = drt.Spectrum3f(args[current_index + 2][0], args[current_index + 2][1], args[current_index + 2][2])
             kappa       = args[current_index + 3]
             default     = args[current_index + 4] is None
             if default:
-                area_lights.append(vredner.AreaLightEx(shape_id, intensity, kappa))
+                area_lights.append(drt.AreaLightEx(shape_id, intensity, kappa))
             else:
                 d_intensity = args[current_index + 4]
                 assert( d_intensity.is_contiguous() )
                 d_kappa = args[current_index + 5]
                 assert( (d_kappa is not None) and d_kappa.is_contiguous() )
-                area_lights.append(vredner.AreaLightEx(shape_id, intensity, kappa, vredner.float_ptr(d_intensity.data_ptr()), vredner.float_ptr(d_kappa.data_ptr())))
+                area_lights.append(drt.AreaLightEx(shape_id, intensity, kappa, drt.float_ptr(d_intensity.data_ptr()), drt.float_ptr(d_kappa.data_ptr())))
             current_index += 6
     
     mediums = []
@@ -243,18 +243,18 @@ def render_scene(integrator, options, *args):
         if args[current_index] == 'homogeneous':
             sigma_t     = args[current_index + 1]
             albedo      = args[current_index + 2]
-            vec_albedo  = vredner.Spectrum3f(albedo[0], albedo[1], albedo[2])
+            vec_albedo  = drt.Spectrum3f(albedo[0], albedo[1], albedo[2])
             phase_id    = args[current_index + 3]
             default     = args[current_index + 4] is None
             if default:
-                mediums.append(vredner.Homogeneous(sigma_t, vec_albedo, phase_id))
+                mediums.append(drt.Homogeneous(sigma_t, vec_albedo, phase_id))
             else:
                 d_sigmaT = args[current_index + 4]
                 assert( d_sigmaT.is_contiguous() )
                 d_albedo = args[current_index + 5]
                 assert( (d_albedo is not None) and d_albedo.is_contiguous() )
-                mediums.append(vredner.Homogeneous(sigma_t, vec_albedo, phase_id, vredner.float_ptr(d_sigmaT.data_ptr()), 
-                                                                                  vredner.float_ptr(d_albedo.data_ptr())))
+                mediums.append(drt.Homogeneous(sigma_t, vec_albedo, phase_id, drt.float_ptr(d_sigmaT.data_ptr()), 
+                                                                                  drt.float_ptr(d_albedo.data_ptr())))
             current_index += 6
         elif args[current_index] == 'heterogeneous':
             fn_density  = args[current_index + 1]
@@ -266,10 +266,10 @@ def render_scene(integrator, options, *args):
             default     = args[current_index + 6] is None
             if default:
                 if vol_albedo:
-                    mediums.append(vredner.Heterogeneous(fn_density, vredner.float_ptr(to_world.data_ptr()), float(scalar), albedo, phase_id))
+                    mediums.append(drt.Heterogeneous(fn_density, drt.float_ptr(to_world.data_ptr()), float(scalar), albedo, phase_id))
                 else:
-                    vec_albedo  = vredner.Spectrum3f(albedo[0], albedo[1], albedo[2])
-                    mediums.append(vredner.Heterogeneous(fn_density, vredner.float_ptr(to_world.data_ptr()), float(scalar), vec_albedo, phase_id))
+                    vec_albedo  = drt.Spectrum3f(albedo[0], albedo[1], albedo[2])
+                    mediums.append(drt.Heterogeneous(fn_density, drt.float_ptr(to_world.data_ptr()), float(scalar), vec_albedo, phase_id))
             else:
                 d_albedo        = args[current_index + 6]
                 assert( d_albedo.is_contiguous() )
@@ -280,47 +280,47 @@ def render_scene(integrator, options, *args):
                 vec_rotate      = args[current_index + 9]
                 assert( (vec_rotate is not None) and vec_rotate.is_contiguous() )
                 if vol_albedo:
-                    mediums.append(vredner.Heterogeneous(fn_density, vredner.float_ptr(to_world.data_ptr()), float(scalar), albedo, phase_id,
-                                                     vredner.float_ptr(vec_translate.data_ptr()),
-                                                     vredner.float_ptr(vec_rotate.data_ptr()),
-                                                     vredner.float_ptr(d_scalar.data_ptr())))                    
+                    mediums.append(drt.Heterogeneous(fn_density, drt.float_ptr(to_world.data_ptr()), float(scalar), albedo, phase_id,
+                                                     drt.float_ptr(vec_translate.data_ptr()),
+                                                     drt.float_ptr(vec_rotate.data_ptr()),
+                                                     drt.float_ptr(d_scalar.data_ptr())))                    
                 else:
-                    vec_albedo  = vredner.Spectrum3f(albedo[0], albedo[1], albedo[2])
-                    mediums.append(vredner.Heterogeneous(fn_density, vredner.float_ptr(to_world.data_ptr()), float(scalar), vec_albedo, phase_id,
-                                                     vredner.float_ptr(vec_translate.data_ptr()),
-                                                     vredner.float_ptr(vec_rotate.data_ptr()),
-                                                     vredner.float_ptr(d_scalar.data_ptr()),
-                                                     vredner.float_ptr(d_albedo.data_ptr())))
+                    vec_albedo  = drt.Spectrum3f(albedo[0], albedo[1], albedo[2])
+                    mediums.append(drt.Heterogeneous(fn_density, drt.float_ptr(to_world.data_ptr()), float(scalar), vec_albedo, phase_id,
+                                                     drt.float_ptr(vec_translate.data_ptr()),
+                                                     drt.float_ptr(vec_rotate.data_ptr()),
+                                                     drt.float_ptr(d_scalar.data_ptr()),
+                                                     drt.float_ptr(d_albedo.data_ptr())))
             current_index += 10
     phases = []
     for i in range(num_phases):
         if args[current_index] == 'isotropic':
-            phases.append(vredner.Isotropic())
+            phases.append(drt.Isotropic())
             current_index += 1
         elif args[current_index] == 'hg':
             g = args[current_index + 1]
             default  = args[current_index + 2] is None
             if default:
-                phases.append(vredner.HG(g));
+                phases.append(drt.HG(g));
             else:
                 d_g  = args[current_index + 2]
                 assert( d_g.is_contiguous() )
-                phases.append(vredner.HG(g, vredner.float_ptr(d_g.data_ptr())));
+                phases.append(drt.HG(g, drt.float_ptr(d_g.data_ptr())));
             current_index += 3
         else:
             raise
 
-    scene = vredner.Scene(camera, shapes, bsdfs, area_lights, phases, mediums)
+    scene = drt.Scene(camera, shapes, bsdfs, area_lights, phases, mediums)
     if args[current_index] is not None:
         print(args[current_index])
-        scene.initEdges(vredner.float_ptr(args[current_index].data_ptr()))
+        scene.initEdges(drt.float_ptr(args[current_index].data_ptr()))
 
     if rect[2] == -1 or rect[3] == -1:
-        rendered_image = torch.zeros(vredner.nder + 1, resolution[1], resolution[0], 3)
+        rendered_image = torch.zeros(drt.nder + 1, resolution[1], resolution[0], 3)
     else:
-        rendered_image = torch.zeros(vredner.nder + 1, rect[3], rect[2], 3)
+        rendered_image = torch.zeros(drt.nder + 1, rect[3], rect[2], 3)
     start = time.time()
-    integrator.render(scene, options, vredner.float_ptr(rendered_image.data_ptr()))
+    integrator.render(scene, options, drt.float_ptr(rendered_image.data_ptr()))
     time_elapsed = time.time() - start
     if print_timing:
         hours, rem = divmod(time_elapsed, 3600)

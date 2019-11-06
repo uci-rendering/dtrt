@@ -1,6 +1,6 @@
 from distutils.core import setup
 
-setup(name = 'vredner',
+setup(name = 'drt',
       version = '0.0.1',
-      description = 'Redner',
-      packages = ['pyvredner'])
+      description = 'Differential Radiative Transfer',
+      packages = ['pydrt'])

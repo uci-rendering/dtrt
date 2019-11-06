@@ -1,4 +1,4 @@
-import pyvredner
+import pydrt
 import torch
 
 class Isotropic:

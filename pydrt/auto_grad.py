@@ -1,7 +1,7 @@
-import pyvredner
+import pydrt
 import torch
 import numpy as np
-from vredner import nder
+from drt import nder
 import math
 import scipy
 import scipy.ndimage 
@@ -27,7 +27,7 @@ class ADLossFunc(torch.autograd.Function):
 																pyramid_scale = 4.0,
 																index_iter = -1,
 																clamping = 0):
-		img = pyvredner.render_scene(integrator, options, *(scene_manager.args))
+		img = pydrt.render_scene(integrator, options, *(scene_manager.args))
 		if index_iter > -1:
 			torch.save(img, 'pt_iter%d.pt'%index_iter)
 		ret = img[0, :, :, :]

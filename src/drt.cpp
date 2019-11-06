@@ -22,7 +22,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(vredner, m) {
+PYBIND11_MODULE(drt, m) {
     m.doc() = "vRedner"; // optional module docstring
 
     py::class_<ptr<float>>(m, "float_ptr")
