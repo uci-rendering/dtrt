@@ -1,7 +1,6 @@
 #include "scene.h"
 #include "math_func.h"
 #include "edge_manager/bruteforce.h"
-#include "edge_manager/tree.h"
 #include <algorithm>
 #include <assert.h>
 #include <iostream>

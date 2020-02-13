@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(drt VERSION 0.0.1 DESCRIPTION "Differentiable Radiative Transfer")
+project(dtrt VERSION 0.0.1 DESCRIPTION "Differentiable Radiative Transfer")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -66,8 +66,6 @@ set(SRCS include/config.h
          src/edge_manager/edge_manager.cpp
          src/edge_manager/bruteforce.h
          src/edge_manager/bruteforce.cpp
-         src/edge_manager/tree.h
-         src/edge_manager/tree.cpp         
          include/scene.h
          src/scene.cpp
          include/emitter.h
@@ -111,22 +109,18 @@ set(SRCS include/config.h
          src/integrator/differential/pathAD.cpp
          src/integrator/differential/volpathAD.h
          src/integrator/differential/volpathAD.cpp
-         src/unit_test/ad_test.h
-         src/unit_test/ad_test.cpp
-         src/unit_test/volume_test.h
-         src/unit_test/volume_test.cpp
-         src/drt.cpp
+         src/dtrt.cpp
          )
 
 if(APPLE)
     set(DYNAMIC_LOOKUP "-undefined dynamic_lookup")
 endif()
 if (WIN32)
-    pybind11_add_module(drt SHARED  ${SRCS} )
+    pybind11_add_module(dtrt SHARED  ${SRCS} )
 endif()
 
 if (NOT WIN32)
-    add_library(drt MODULE ${SRCS})
+    add_library(dtrt MODULE ${SRCS})
     # The "-undefined dynamic_lookup" is a hack for systems with
     # multiple Python installed. If we link a particular Python version
     # here, and we import it with a different Python version later.
@@ -135,17 +129,17 @@ if (NOT WIN32)
     # https://github.com/pybind/pybind11/blob/master/tools/pybind11Tools.cmake
     # is to not link against Python library at all and resolve the symbols
     # at compile time.
-    target_link_libraries(drt
+    target_link_libraries(dtrt
         ${EMBREE_LIBRARY}
         ${DYNAMIC_LOOKUP})
 else()
-    target_link_libraries(drt
+    target_link_libraries(dtrt
     PRIVATE
         ${EMBREE_LIBRARY}
         )
 endif()
 
-set_target_properties(drt PROPERTIES PREFIX "")
+set_target_properties(dtrt PROPERTIES PREFIX "")
 
 execute_process(
     COMMAND "python" -c "if True:
@@ -155,7 +149,7 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 install(
-    TARGETS drt
+    TARGETS dtrt
     DESTINATION ${PYTHON_SITE})
 
 execute_process (
