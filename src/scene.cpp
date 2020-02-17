@@ -136,9 +136,9 @@ Scene::Scene(const Camera &camera,
 }
 
 void Scene::initEdges(const Eigen::Array<Float, -1, 1> &samplingWeights) {
-    assert(static_cast<size_t>(samplingWeights.rows()) == shape_list.size());    
-    // ptr_edgeManager = new BruteForceEdgeManager(*this, samplingWeights);
-    ptr_edgeManager = new TreeEdgeManager(*this, samplingWeights);
+    assert(static_cast<size_t>(samplingWeights.rows()) == shape_list.size());
+    ptr_edgeManager = new BruteForceEdgeManager(*this, samplingWeights);
+    // ptr_edgeManager = new TreeEdgeManager(*this, samplingWeights);
 }
 
 Scene::~Scene() {
@@ -833,5 +833,5 @@ Float Scene::sampleAttenuatedSensorDirect(const Vector& p, const Medium* ptr_med
         return value;
     } else {
         return 0.0f;
-    }    
+    }
 }

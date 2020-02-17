@@ -150,6 +150,7 @@ execute_process(
 
 install(
     TARGETS dtrt
+    LIBRARY DESTINATION ${PYTHON_SITE}
     DESTINATION ${PYTHON_SITE})
 
 execute_process (

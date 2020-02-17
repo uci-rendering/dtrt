@@ -15,15 +15,14 @@
 #include "integrator/differential/directAD.h"
 #include "integrator/differential/pathAD.h"
 #include "integrator/differential/volpathAD.h"
-#include "unit_test/ad_test.h"
 #include "config.h"
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(drt, m) {
-    m.doc() = "vRedner"; // optional module docstring
+PYBIND11_MODULE(dtrt, m) {
+    m.doc() = "dtrt"; // optional module docstring
 
     py::class_<ptr<float>>(m, "float_ptr")
         .def(py::init<std::size_t>());
@@ -153,6 +152,4 @@ PYBIND11_MODULE(drt, m) {
     m.attr("nder") = nder;
     m.attr("angleEps") = AngleEpsilon;
 
-    // Unit Tests
-    m.def("ad_test", &ad_test, "");
 }
