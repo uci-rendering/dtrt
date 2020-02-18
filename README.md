@@ -22,7 +22,7 @@ sudo make install -j
 cd examples/glass_1
 python3 optimize.py
 ```
-To run any other example script, you need to change the global variable `nder` defined in file `include/config.h` so that the number of scene parameters in each example equals to `nder`. For the number of parameters in each example scene, please refer to the supplemental webpage(https://shuangz.com/projects/diffrender-sa19/supp_material/) of the paper
+To run any other example script, you need to change the global variable `nder` defined in file `include/config.h` so that the number of scene parameters in each example equals to `nder` value. For the number of parameters in each example scene, please refer to the [supplemental webpage](https://shuangz.com/projects/diffrender-sa19/supp_material/) of the paper
 
 ## Dependencies
 
