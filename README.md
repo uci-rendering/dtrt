@@ -10,7 +10,18 @@ The renderer involves two components, C++ code `src` for computing the derivativ
 
 
 ## Installation
-
+1. install all the dependencies with the provided script (You can also install them manually)
+```
+./install.sh
+exec bash -l
+```
+2. install the dtrt & pydtrt library
+```
+mkdir build
+cd build
+cmake ..
+sudo make install -j
+```
 
 ## Dependencies
 
