@@ -19,9 +19,10 @@ sudo make install -j
 ```
 3. Run example script to ensure the installation is successful
 ```
-cd examples/[scene_name]
+cd examples/glass_1
 python3 optimize.py
 ```
+To run any other example script, you need to change the global variable `nder` defined in file `include/config.h` so that the number of scene parameters in each example equals to `nder`. For the number of parameters in each example scene, please refer to the supplemental webpage(https://shuangz.com/projects/diffrender-sa19/supp_material/) of the paper
 
 ## Dependencies
 
@@ -39,5 +40,8 @@ redner depends on a few libraries/systems, which are all included in the reposit
 ## Documentation
 
 The renderer involves two components, C++ code `src` for computing the derivatives and python interface `pydtrt` for optimization using pytorch.
+
+(TBD)
+
 
 If you have any questions/comments/bug reports, feel free to open a github issue or e-mail to the author Cheng Zhang (zhangchengee@gmail.com)
