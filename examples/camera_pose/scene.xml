@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='utf-8'?>
+
+<scene version="0.5.0">
+	<integrator type="volpath">
+		<integer name="maxDepth" value="10"/>
+	</integrator>
+
+	<sensor type="perspective">
+		<float name="farClip" value="99.3137"/>
+		<float name="focusDistance" value="0.512053"/>
+		<float name="fov" value="28"/>
+		<string name="fovAxis" value="x"/>
+		<float name="nearClip" value="0.001"/>
+		<transform name="toWorld">
+
+			<lookat target="0.34226, 1.15254, -0.122495" origin="-0.638513, 0.957645, -0.112514" up="-0.194922, 0.980817, -0.00152866"/>
+		</transform>
+
+		<sampler type="independent">
+			<integer name="sampleCount" value="128"/>
+		</sampler>
+
+		<film type="hdrfilm">
+			<integer name="height" value="256"/>
+			<integer name="width" value="256"/>
+
+			<rfilter type="box"/>
+		</film>
+	</sensor>
+
+	<bsdf type="diffuse" id="white">
+		<spectrum name="reflectance" value="0.3, 0.3, 0.3"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="light">
+		<spectrum name="reflectance" value="0.936461, 0.740433, 0.705267"/>
+	</bsdf>
+
+	<bsdf type="null" id="null"/>
+
+	<shape type="obj">
+		<string name="filename" value="meshes/luminaire.obj"/>
+		<boolean name="faceNormals" value="true"/>
+		<transform name="toWorld">
+			<scale x="0.1" y="1.0" z="0.1"/>
+			<rotate x="1.0" y="0.0" z="0.0" angle="-60"/>
+			<translate x="0.0" y="2.5" z="-1.0"/>
+		</transform>
+
+		<ref id="light"/>
+
+		<emitter type="area">
+			<spectrum name="radiance" value="1000.0, 1000.0, 1000.0"/>
+		</emitter>
+	</shape>
+
+	<medium type="heterogeneous" id="cube">
+		<volume name="density" type="gridvolume">
+			<string name="filename" value="density.vol"/>
+			<transform name="toWorld">
+				<scale x="0.001" y="0.001" z="0.001"/>
+				<translate x="0" y="1.0" z="0"/>
+			</transform>
+		</volume>
+		<float name="scale" value="5.0"/>
+
+		<volume name="albedo" type="gridvolume">
+			<string name="filename" value="albedo.vol"/>
+			<transform name="toWorld">
+				<scale x="0.001" y="0.001" z="0.001"/>
+				<translate x="0" y="1.0" z="0"/>
+			</transform>
+		</volume>
+	</medium>
+
+	<shape type="obj">
+		<string name="filename" value="meshes/bounding_cube.obj"/>
+		<boolean name="faceNormals" value="true"/>
+		<transform name="toWorld">
+			<scale x="0.001" y="0.001" z="0.001"/>
+			<translate x="0" y="1.0" z="0"/>
+		</transform>
+
+		<ref id="null"/>
+
+		<ref name="interior" id="cube"/>
+	</shape>
+
+	<!--	<shape type="obj">
+		<string name="filename" value="meshes/wall.obj"/>
+		<boolean name="faceNormals" value="true"/>
+		<transform name="toWorld">
+			<scale x="1.0" y="0.004" z="0.004"/>
+			<translate x="1.0" y="1.0" z="0"/>
+		</transform>
+		<ref id="white"/>
+	</shape> -->
+
+
+</scene>

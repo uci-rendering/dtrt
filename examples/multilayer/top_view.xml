@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding='utf-8'?>
+
+<scene version="0.5.0">
+	<integrator type="volpath">
+		<integer name="maxDepth" value="20"/>
+	</integrator>
+
+	<sensor type="perspective">
+		<float name="farClip" value="10000"/>
+		<float name="fov" value="50"/>
+		<string name="fovAxis" value="x"/>
+		<float name="nearClip" value="0.001"/>
+		<transform name="toWorld">
+			<lookat target="0, 5, 0" origin="0, 6, 0" up="1, 0, 0"/>
+		</transform>
+		<sampler type="independent">
+			<integer name="sampleCount" value="128"/>
+		</sampler>
+		<film type="hdrfilm">
+			<integer name="height" value="256"/>
+			<integer name="width" value="256"/>
+			<rfilter type="box"/>
+		</film>
+	</sensor>
+
+	<bsdf type="roughdielectric" id="bsdf_top">
+		<float name="intIOR" value="1.5"/>
+		<float name="extIOR" value="1.0"/>
+		<float name="alpha" value="0.01"/>
+	</bsdf>
+
+	<bsdf type="roughdielectric" id="bsdf_bot">
+		<float name="intIOR" value="1.2"/>
+		<float name="extIOR" value="1.0"/>
+		<float name="alpha" value="0.01"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="gray">
+		<spectrum name="reflectance" value="0.01, 0.01, 0.01"/>
+	</bsdf>
+
+	<medium type="homogeneous" id="med_top">
+		<spectrum name="sigmaT" value="0.412"/>
+		<spectrum name="albedo" value="0.97, 0.97, 0.97"/>
+	</medium>
+
+	<medium type="homogeneous" id="med_bot">
+		<spectrum name="sigmaT" value="1.9"/>
+		<spectrum name="albedo" value="0.95, 0.95, 0.95"/>
+	</medium>
+
+	<bsdf type="null" id="null"/>
+
+	<shape type="obj">
+		<string name="filename" value="layer_top.obj"/>
+		<boolean name="faceNormals" value="true"/>
+		<transform name="toWorld">
+			<scale x="8" y="0.18" z="8"/>
+		</transform>
+		<ref id="null"/>
+		<ref name="interior" id="med_top"/>
+	</shape>
+
+	<shape type="obj">
+		<string name="filename" value="interface.obj"/>
+		<boolean name="faceNormals" value="true"/>
+		<transform name="toWorld">
+			<scale x="8" y="1.0" z="8"/>
+			<translate x="0" y="-0.18" z="0"/>
+		</transform>
+		<ref id="null"/>
+		<ref name="interior" id="med_top"/>
+		<ref name="exterior" id="med_bot"/>
+	</shape>
+
+
+	<shape type="obj">
+		<string name="filename" value="layer_bot.obj"/>
+		<boolean name="faceNormals" value="true"/>
+		<transform name="toWorld">
+			<scale x="8" y="8.0" z="8"/>
+			<translate x="0" y="-8.180" z="0"/>
+		</transform>
+		<ref id="null"/>
+		<ref name="interior" id="med_bot"/>
+	</shape>
+
+	<shape type="obj">
+		<string name="filename" value="emitter.obj"/>
+		<boolean name="faceNormals" value="true"/>
+		<transform name="toWorld">
+			<scale x="8" y="1.0" z="8"/>
+			<translate x="0" y="8.0" z="0"/>
+		</transform>
+		<ref id="gray"/>
+		<emitter type="area">
+			<spectrum name="radiance" value="1.0, 1.0, 1.0"/>
+		</emitter>
+	</shape>
+
+	<shape type="obj">
+		<string name="filename" value="apple.obj"/>
+		<transform name="toWorld">
+			<translate x="-0.47" y="4.65" z="-1.43"/>
+			<translate x="1.0" y="-0.3" z="0.8"/>
+		</transform>
+		<ref id="gray"/>
+	</shape>
+</scene>

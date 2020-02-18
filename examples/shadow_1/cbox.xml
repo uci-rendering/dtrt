@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='utf-8'?>
+
+<scene version="0.5.0">
+	<integrator type="volpathAD">
+		<integer name="maxDepth" value="5"/>
+	</integrator>
+
+	<sensor type="perspective">
+		<float name="fov" value="39.3077"/>
+		<float name="nearClip" value="0.01"/>
+		<transform name="toWorld">
+			<lookat target="387.827, 146.254, -101.307" origin="387.989, 146.453, -102.274" up="-0.0505085, 0.97986, 0.19319"/>
+		</transform>
+
+		<sampler type="independent">
+			<integer name="sampleCount" value="1024"/>
+		</sampler>
+
+		<film type="hdrfilm">
+			<integer name="height" value="256"/>
+			<integer name="width" value="256"/>
+			<rfilter type="box"/>
+		</film>
+	</sensor>
+
+	<bsdf type="diffuse" id="white">
+		<spectrum name="reflectance" value="0.885809, 0.698859, 0.666422"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="red">
+		<spectrum name="reflectance" value="0.570068, 0.0430135, 0.0443706"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="green">
+		<spectrum name="reflectance" value="0.105421, 0.37798, 0.076425"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="light">
+		<spectrum name="reflectance" value="0.936461, 0.740433, 0.705267"/>
+	</bsdf>
+
+	<bsdf type="phong" id="glossy">
+		<float name="exponent" value="100"/>
+	</bsdf>
+
+	<bsdf type="null" id="null"/>
+
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_luminaire.obj"/>
+		<transform name="toWorld">
+			<translate x="0" y="-0.5" z="0"/>
+		</transform>
+
+		<ref id="light"/>
+
+		<emitter type="area">
+			<spectrum name="radiance" value="8.0, 8.0, 8.0"/>
+		</emitter>
+	</shape>
+
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_floor.obj"/>
+
+		<ref id="white"/>
+	</shape>
+
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_back.obj"/>
+
+		<ref id="glossy"/>
+	</shape>
+
+	<medium type="homogeneous" id="small_box_med">
+		<spectrum name="sigmaT" value="0.1"/>
+		<spectrum name="albedo" value="0.9, 0.5, 0.5"/>
+	</medium>
+
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_smallbox_fixed.obj"/>
+		<boolean name="faceNormals" value="true"/>
+
+		<ref id="null"/>
+
+		<ref name="interior" id="small_box_med"/>
+		<transform name="toWorld">
+			<translate x="50" y="300" z="200"/>
+		</transform>
+	</shape>
+</scene>

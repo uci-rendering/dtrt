@@ -142,7 +142,7 @@ endif()
 set_target_properties(dtrt PROPERTIES PREFIX "")
 
 execute_process(
-    COMMAND "python3" -c "if True:
+    COMMAND "python" -c "if True:
         from distutils import sysconfig as sc
         print(sc.get_python_lib())"
     OUTPUT_VARIABLE PYTHON_SITE
@@ -154,7 +154,7 @@ install(
     DESTINATION ${PYTHON_SITE})
 
 execute_process (
-    COMMAND "python3" -c "from distutils.sysconfig import get_python_version; print(get_python_version())"
+    COMMAND "python" -c "from distutils.sysconfig import get_python_version; print(get_python_version())"
     OUTPUT_VARIABLE PYTHON_VERSION
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 install(CODE "execute_process(COMMAND python${PYTHON_VERSION} ${CMAKE_CURRENT_SOURCE_DIR}/setup.py install

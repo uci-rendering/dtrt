@@ -13,6 +13,13 @@
 *.user
 *.opendb
 *.exr
+*.pyc
+include/config.h
+examples/glass_1/results
+examples/camera_pose/results
+examples/multilayer/results
+examples/shadow_1/results
+examples/shadow_2/results
 dependencies/*
 build
 embree
