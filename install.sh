@@ -15,7 +15,7 @@ wget https://github.com/Kitware/CMake/releases/download/v3.16.3/cmake-3.16.3.tar
 tar -zxvf cmake-3.16.3.tar.gz
 cd cmake-3.16.3
 ./bootstrap
-sudo make install -j
+sudo make install -j8
 cd ..
 
 git clone https://github.com/embree/embree.git
