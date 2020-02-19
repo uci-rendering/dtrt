@@ -1,8 +1,8 @@
-# dtrt: Unbiased Differentiable Volumetric Renderer
+# dtrt: Unbiased Differentiable Volumetric Path Tracer
 
 ![](https://shuangz.com/projects/diffrender-sa19/teaser.png)
 
-dtrt is a physics-based differentiable renderer that can compute derivatives of rendering output with respect to arbitrary scene parameters. The renderer is capable of providing an unbiased estimation of image derivative in the existence of volumetric configuration (smoke, liquid etc.) and geometric discontinuities. The differentiable renderer can be used for solving inverse rendering problem through gradient descent optimization. For more details on the renderer and the theory behind, please refer to the paper: [A Differential Theory of Radiative Transfer](https://shuangz.com/projects/diffrender-sa19/), Cheng Zhang, Lifan Wu, Changxi Zheng, Ioannis Gkioulekas, Ravi Ramamoorthi, Shuang Zhao.
+dtrt is a physics-based differentiable renderer computes derivative images with respect to arbitrary scene parameters (e.g., object geometries and material properties). This renderer is capable of producing unbiased derivative estimates with the presence of heterogeneous participating media. The estimated derivatives can be used for solving inverse rendering problems through gradient-based optimizations. For more details on our differential radiative transfer theory, please refer to the paper: [A Differential Theory of Radiative Transfer](https://shuangz.com/projects/diffrender-sa19/), Cheng Zhang, Lifan Wu, Changxi Zheng, Ioannis Gkioulekas, Ravi Ramamoorthi, Shuang Zhao.
 
 ## Installation
 1. install all the dependencies with the provided script (You can also install them manually)
