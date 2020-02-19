@@ -26,7 +26,7 @@ To run any other example script, you need to change the global variable `nder` d
 
 ## Dependencies
 
-redner depends on a few libraries/systems, which are all included in the repository:
+dtrt depends on a few libraries/systems, which are all included in the repository:
 - [Eigen3](http://eigen.tuxfamily.org)
 - [Python 3.6 or above](https://www.python.org)
 - [pybind11](https://github.com/pybind/pybind11)
