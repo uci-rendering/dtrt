@@ -15,7 +15,7 @@ cd dependencies
 # tar -zxvf cmake-3.16.3.tar.gz
 # cd cmake-3.16.3
 # ./bootstrap
-# sudo make install -j8
+# sudo make install -j
 # cd ..
 
 git clone https://github.com/embree/embree.git
@@ -26,15 +26,15 @@ cd embree
 mkdir -p build
 cd build
 cmake -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc -DEMBREE_ISPC_SUPPORT=OFF ..
-sudo make install -j8
+sudo make install -j
 
 # Compile Pybind11
 cd ../../pybind11
 mkdir -p build
 cd build
 cmake ..
-make check -j8
-sudo make install -j8
+make check -j
+sudo make install -j
 
 echo '''
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
