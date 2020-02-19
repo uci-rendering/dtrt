@@ -13,7 +13,7 @@
 exec bash -l
 ```
 
-2. Install the `dtrt` & `pydtrt` libraries:
+2. Compile the `dtrt` & `pydtrt` libraries:
 ```
 mkdir build
 cd build
@@ -21,7 +21,7 @@ cmake ..
 sudo make install -j
 ```
 
-3. To test if the compilation is successful, execute the example script:
+3. (Optional) To test if the compilation is successful, execute the example script:
 ```
 cd examples/glass_1
 python3 optimize.py
